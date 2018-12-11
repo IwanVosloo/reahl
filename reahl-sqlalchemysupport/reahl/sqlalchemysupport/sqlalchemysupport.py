@@ -55,7 +55,10 @@ class SqlAlchemyConfig(Configuration):
         if not isinstance(config.reahlsystem.orm_control, SqlAlchemyControl):
             config.reahlsystem.orm_control = SqlAlchemyControl(echo=False)
 
+    create_engine_kwargs = ConfigSetting(default={'pool_pre_ping': True},
+                                         description='A dictionary with kwargs sent to create_engine.')
 
+    
 def reahl_scope():
     try:
         return ExecutionContext.get_context_id()
@@ -240,7 +243,7 @@ class SqlAlchemyControl(ORMControl):
         config = context.config
         db_api_connection_creator = context.system_control.db_control.get_dbapi_connection_creator()
 
-        create_args = {'pool_pre_ping': True}
+        create_args = config.sqlalchemy.create_engine_kwargs.copy()
         if db_api_connection_creator:
             create_args['creator']=db_api_connection_creator
 
